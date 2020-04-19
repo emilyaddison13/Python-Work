@@ -1,0 +1,165 @@
+#Emily Addison
+#104553525
+import pprint
+pp = pprint.PrettyPrinter(indent=4) #makes the matrix print horizontal instead of vertical
+
+#Breadth first search
+def breadth_first(matrix,end):
+
+    begin = [[matrix]]
+    depth = 0
+    expanded = [] #nodes weve visited
+    expanded_nodes=0 # counter for nodes
+    while begin:
+        i = 0
+        for j in range(1, len(begin)):   # loop to go through matrix 
+            if len(begin[i]) > len(begin[j]):
+                i = j
+        path = begin[i]         
+        begin = begin[:i] + begin[i+1:] #before i + before i plus 1
+        endnode = path[-1]# create path with unexpanded nodes
+        if endnode in expanded: continue
+        for k in moves(endnode):
+            if k in expanded: continue #keep checking through path
+            begin.append(path + [k]) # append path to begin of matrix
+        expanded.append(endnode) # add untouched notes to expanded list
+        expanded_nodes += 1
+        if endnode == end: break #check if matches end goal
+    print "Expanded nodes:",expanded_nodes
+    print "Solution:"
+    print "Depth:", len(path)
+    pp.pprint(path)
+
+# A* search
+#Traverse through paths finding cheapest based on path cost and heuristic cost of nodes
+def astar(matrix,end):
+
+    begin = [[heur2(matrix), matrix]] 
+    expanded = []#nodes we visited
+    expanded_nodes=0
+    while begin:
+        i = 0
+        for j in range(1, len(begin)):
+            if begin[i][0] > begin[j][0]:
+                i = j
+        path = begin[i]
+        begin = begin[:i] + begin[i+1:] #all before i plus all after i + 1
+        endnode = path[-1]
+        if endnode == end:
+            break
+        if endnode in expanded: continue #if matrix does not match endgoal searcg through matrix
+        for k in moves(endnode):
+            if k in expanded: continue
+            newpath = [path[0] + heur2(k) - heur2(endnode)] + path[1:] + [k] #uses heuristics to find the cheapest path + heuristics
+            begin.append(newpath)
+            expanded.append(endnode)
+        expanded_nodes += 1 
+    print "Expanded nodes:", expanded_nodes
+    print "Solution:"
+    print "Depth: ", len(path)
+    pp.pprint(path)
+
+
+#Greedy Best Search
+#Searches through to find path with cheapest heuristics
+def greedy_best(matrix,end):
+    begin = [[heur2(matrix), matrix]] #finds manhatten distance and calls in matrix
+    expanded = []
+    expanded_nodes=0
+    while begin:
+        i = 0
+        for j in range(1, len(begin)):
+            if begin[i][0] > begin[j][0]:
+                i = j
+        path = begin[i]
+        begin = begin[:i] + begin[i+1:]
+        endnode = path[-1]
+        if endnode == end:
+            break
+        if endnode in expanded: continue
+        for k in moves(endnode):
+            if k in expanded: continue
+            newpath = [heur2(k) - heur2(endnode)] + [k] #finds cheapest uses only heuristics costs
+            begin.append(newpath)
+            expanded.append(endnode)
+        expanded_nodes += 1 
+    print "Expanded nodes:", expanded_nodes
+    print "Solution:"
+    print "Depth: ", len(path)
+    pp.pprint(path)
+
+def moves(mat): 
+   
+   
+    out = []  
+
+    m = eval(mat)   
+    i = 0
+    while 0 not in m[i]: i += 1
+    j = m[i].index(0);
+
+    if j > 0:                                                      
+      m[i][j], m[i][j-1] = m[i][j-1], m[i][j]   #tp move left
+      out.append(str(m))
+      m[i][j], m[i][j-1] = m[i][j-1], m[i][j]
+
+    if j < 3:                                   
+      m[i][j], m[i][j+1] = m[i][j+1], m[i][j]   #to move right
+      out.append(str(m))
+      m[i][j], m[i][j+1] = m[i][j+1], m[i][j]
+
+    if i > 0:                                   
+      m[i][j], m[i-1][j] = m[i-1][j], m[i][j];  #to move up
+      out.append(str(m))
+      m[i][j], m[i-1][j] = m[i-1][j], m[i][j]; 
+      
+    if i < 3:                                   
+      m[i][j], m[i+1][j] = m[i+1][j], m[i][j]   #to move down
+      out.append(str(m))
+      m[i][j], m[i+1][j] = m[i+1][j], m[i][j]
+
+    return out
+
+# Number of misplaced tiles
+def heur1(puzz):
+
+    moved = 0
+    compare = 0
+    m = eval(puzz)
+    for i in range(4):
+        for j in range(4):
+            if m[i][j] != compare:
+                moved += 1
+            compare += 1
+    return moved
+
+#Manhatten Distance
+#Total distance between where number are supposed to be
+def heur2(puzz):
+    dist = 0
+    m = eval(puzz)          
+    for i in range(4):
+        for j in range(4):
+            if m[i][j] == 0: continue
+            dist += abs(i - (m[i][j]/4)) + abs(j -  (m[i][j]%4)); # absolute value of i - goal of i + absolute value of j - goal of j
+    return dist
+
+
+
+if __name__ == '__main__':
+    ##print('What search would you like to run?')
+    ##print('1. Breadth First Search\n2. A* Search\n3. Greedy Search\n')
+    user_int  = raw_input()
+    matrix = [[0 for j in range(4)] for i in range(4)]
+    for i in range (0,4):
+            for j in range (0,4):
+                print ('enter in 0-9,A-F in row: ',i+1,' column: ',j+1)
+
+   
+
+
+    puzzle = str(matrix)
+    end = str([1, 2, 3, 4],[5, 6, 7, 8], [9, 10, 11, 12],[13, 14, 15, 0])
+    astar(puzzle,end)
+    #breadth_first(puzzle,end)
+    #greedy_best(puzzle,end)

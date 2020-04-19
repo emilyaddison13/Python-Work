@@ -1,0 +1,10 @@
+x = 15
+mylist = list()
+while x >= 0:
+    numbers = raw_input("Enter in a character from 1-9, A-F or a space")
+    mylist.append(numbers)
+    x-=1
+print mylist
+
+
+
